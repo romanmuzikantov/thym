@@ -1,6 +1,6 @@
 # thym
 
-A new Flutter project.
+Thym is a flutter application made as a side project. The purpose of the app is to help me organize and handle my time more efficiently. 📱
 
 ## Getting Started
 
