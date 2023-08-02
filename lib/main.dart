@@ -1,34 +1,29 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:thym/pages/home_page.dart';
-import 'package:thym/theme/color_schemes.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:thym/providers/timers_box_provider.dart';
+import 'package:thym/src/my_app.dart';
 
-final _router = GoRouter(initialLocation: '/', routes: [
-  GoRoute(
-      name: 'home', path: '/', builder: (contex, state) => const HomePage()),
-]);
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
-  runApp(const MyApp());
-}
+  Directory directory = await getApplicationDocumentsDirectory();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final hiveCollection = await BoxCollection.open(
+    'ThymCollection',
+    {'timers'},
+    path: directory.path,
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Thym',
-      theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: lightColorScheme,
-          fontFamily: 'DaiBanna'),
-      darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: darkColorScheme,
-          fontFamily: 'DaiBanna'),
-      themeMode: ThemeMode.system,
-      routerConfig: _router,
-    );
-  }
+  final timersBox = await hiveCollection.openBox('timers');
+
+  runApp(ProviderScope(
+    overrides: [
+      timersBoxProvider.overrideWithValue(timersBox),
+    ],
+    child: const MyApp(),
+  ));
 }
